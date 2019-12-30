@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</head>
+<style>
+    body {
+        background-color: burlywood;
+    }
+</style>
+<body>
+<div id="app">
+    <h1>Hello </h1>
+    <form>
+        <input type="text" placeholder="姓名：" v-model="addname.uname">
+        <button @click="onsubmit">添加</button>
+        <input type="text" placeholder="更新姓名">
+        <button @click="updataBook">更新</button>
+    </form>
+    <table>
+        <tr v-for="book of books">
+            <td>{{book.id}}</td>
+            <td>{{book.uname}}</td>
+            <td>
+                <button @click="deleteBook(book)">delete</button>
+                <button @click="updataBook(book)">updata</button>
+            </td>
+        </tr>
+    </table>
+</div>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            addname: {},
+            books: [
+                {id: "1", uname: "xiaoming"},
+            ]
+        },
+        created() {
+            axios.get("books").then(
+                res => {
+                    this.books = res.data;
+                }
+            )
+        },
+        methods: {
+            deleteBook(book) {
+                axios.delete('books/' + book.id)
+                    .then(res => {
+                        var index = this.books.findIndex(book => book.id == book.id)
+                        this.books.splice(index, 1)
+                    })
+            },
+            onsubmit: function (e) {
+                axios.post("books", this.addname)
+                    .then(addname => {
+                        this.addname.unshift(addname);
+                    });
+            },
+            updataBook(book,e){
+                axios({
+                    url:'books/'+book.id,
+                    method: 'put',
+                    data: {
+                        "uname":"小米"
+                    }
+                }).then(res=>{
+                  this.uname.unshift(res)
+                })
+                e.preventDefault();
+            }
+        }
+    })
+</script>
+</body>
+</html>
